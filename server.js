@@ -11,6 +11,9 @@ const port = process.env.PORT;
 // connect to db
 connectDB();
 
+app.get("/", (req, res) => {
+	res.send("API is running...");
+});
 // api endpoints
 app.use("/api/user", require("./src/routes/userRoute"));
 app.use("/api/auth", require("./src/routes/authRoute"));
