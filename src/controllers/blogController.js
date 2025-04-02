@@ -24,15 +24,16 @@ const createBlog = async (req, res, next) => {
 	}
 };
 
-const getAllBlogs = async (req, res, next) => {
+const getBlogs = async (req, res, next) => {
 	try {
 		const startIndex = parseInt(req.query.startIndex) || 0;
 		const limit = parseInt(req.query.limit) || 9;
 		const sortDirection = req.query.order === "asc" ? 1 : -1;
 		const blogs = await Blog.find({
-			...(req.query.blogId && { _id: req.query.blogId }),
+			...(req.query.userId && { userId: req.query.userId }),
 			...(req.query.category && { category: req.query.category }),
 			...(req.query.slug && { slug: req.query.slug }),
+			...(req.query.blogId && { _id: req.query.blogId }),
 			...(req.query.searchTerm && {
 				$or: [
 					{ title: { $regex: req.query.searchTerm, $options: "i" } },
@@ -90,7 +91,7 @@ const updateBlog = async (req, res, next) => {
 					title: req.body.title,
 					content: req.body.content,
 					category: req.body.category,
-					image: req.body.image,
+					thumnail: req.body.thumnail,
 				},
 			},
 			{ new: true }
@@ -101,4 +102,4 @@ const updateBlog = async (req, res, next) => {
 	}
 };
 
-module.exports = { getAllBlogs, createBlog, deleteBlog, updateBlog };
+module.exports = { getBlogs, createBlog, deleteBlog, updateBlog };

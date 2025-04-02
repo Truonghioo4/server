@@ -35,6 +35,7 @@ const updateUser = async (req, res, next) => {
 						gender: req.body.gender, // Giới tính
 						phone: req.body.phone, // Số điện thoại
 						address: req.body.address, // Địa chỉ
+						
 					},
 				},
 				{ new: true }

@@ -10,7 +10,7 @@ const {
 
 userRouter.get("/test", (req, res) => res.json({ success: true }));
 userRouter.put("/update/:userId", verifyToken, updateUser);
-userRouter.post("/signout", signout);
+userRouter.post("/sign-out", signout);
 userRouter.get("/getusers", verifyToken, getUsers);
 userRouter.get("/:userId", getUserProfile);
 

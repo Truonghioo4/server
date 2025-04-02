@@ -1,24 +1,23 @@
 const express = require("express");
 const {
-    getAllBlogs,
-    createBlog,
-    updateBlog,
-    deleteBlog,
+	getBlogs,
+	createBlog,
+	updateBlog,
+	deleteBlog,
 } = require("../controllers/blogController");
-
+const verifyToken = require("../utils/verifyUser");
 const blogRouter = express.Router();
 
 // Route lấy tất cả các blog
-blogRouter.get("/", getAllBlogs);
-
+blogRouter.get("/get-blogs", getBlogs);
 
 // Route tạo blog mới (chỉ admin)
-blogRouter.post("/", createBlog);
+blogRouter.post("/create-blog", createBlog);
 
 // Route cập nhật blog (chỉ admin)
-blogRouter.put("/:id", updateBlog);
+blogRouter.put("/update-blog/:blogId", verifyToken, updateBlog);
 
 // Route xóa blog (chỉ admin)
-blogRouter.delete("/:id", deleteBlog);
+blogRouter.delete("/delete-blog/:blogId", verifyToken, deleteBlog);
 
 module.exports = blogRouter;

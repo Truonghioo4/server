@@ -1,38 +1,47 @@
 const Tour = require("../models/tourModel");
 const errorHandler = require("../utils/error");
 
-const getAllTours = async (req, res, next) => {
+const getTours = async (req, res, next) => {
 	try {
 		// Lấy các tham số từ query
 		const startIndex = parseInt(req.query.startIndex) || 0; // Vị trí bắt đầu
 		const limit = parseInt(req.query.limit) || 9; // Số lượng kết quả trả về
 		const sortDirection = req.query.order === "asc" ? 1 : -1; // Sắp xếp tăng dần hoặc giảm dần
 
-		// Xây dựng bộ lọc
-		const filter = {};
-		if (req.query.category) filter.category = req.query.category;
-		if (req.query.slug) filter.slug = req.query.slug;
-		if (req.query.searchTerm) {
-			filter.$or = [
-				{ title: { $regex: req.query.searchTerm, $options: "i" } },
-				{ description: { $regex: req.query.searchTerm, $options: "i" } },
-				{ location: { $regex: req.query.searchTerm, $options: "i" } },
-			];
-		}
+		const tours = await Tour.find({
+			...(req.query.userId && { userId: req.query.userId }),
+			...(req.query.category && { category: req.query.category }),
+			...(req.query.slug && { slug: req.query.slug }),
+			...(req.query.tourId && { _id: req.query.tourId }),
+			...(req.query.searchTerm && {
+				$or: [
+					{ title: { $regex: req.query.searchTerm, $options: "i" } },
+					{ content: { $regex: req.query.searchTerm, $options: "i" } },
+				],
+			}),
+		})
+			.sort({ updatedAt: sortDirection })
+			.skip(startIndex)
+			.limit(limit);
+		const totalTours = await Tour.countDocuments();
 
-		// Lấy danh sách tour từ cơ sở dữ liệu
-		const tours = await Tour.find(filter)
-			.sort({ updatedAt: sortDirection }) // Sắp xếp theo thời gian cập nhật
-			.skip(startIndex) // Bỏ qua các kết quả trước đó
-			.limit(limit); // Giới hạn số lượng kết quả
+		const now = new Date();
 
-		// Đếm tổng số tour phù hợp với bộ lọc
-		const totalTours = await Tour.countDocuments(filter);
+		const oneMonthAgo = new Date(
+			now.getFullYear(),
+			now.getMonth() - 1,
+			now.getDate()
+		);
+
+		const lastMonthTours = await Tour.countDocuments({
+			createdAt: { $gte: oneMonthAgo },
+		});
 
 		// Trả về kết quả
 		res.status(200).json({
 			tours,
 			totalTours,
+			lastMonthTours,
 		});
 	} catch (error) {
 		next(error); // Gửi lỗi đến middleware xử lý lỗi
@@ -140,4 +149,4 @@ const deleteTour = async (req, res, next) => {
 	}
 };
 
-module.exports = { getAllTours, createTour, updateTour, deleteTour };
+module.exports = { getTours, createTour, updateTour, deleteTour };

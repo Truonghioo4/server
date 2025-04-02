@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-	getAllTours,
+	getTours,
 	createTour,
 	updateTour,
 	deleteTour,
@@ -8,15 +8,15 @@ const {
 const router = express.Router();
 const verifyToken = require("../utils/verifyUser");
 // Route lấy tất cả các tour
-router.get("/", getAllTours);
+router.get("/get-tours", getTours);
 
 // Route tạo tour mới (chỉ admin)
-router.post("/", verifyToken, createTour);
+router.post("create-tour", verifyToken, createTour);
 
 // Route cập nhật tour (chỉ admin)
-router.put("/:id", verifyToken, updateTour);
+router.put("/update-tour/:id", verifyToken, updateTour);
 
 // Route xóa tour (chỉ admin)
-router.delete("/:id", verifyToken, deleteTour);
+router.delete("/delete-tour/:id", verifyToken, deleteTour);
 
 module.exports = router;
